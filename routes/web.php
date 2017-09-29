@@ -11,6 +11,10 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [
+    'as' => 'feed.index', 'uses' => 'FeedController@index'
+]);
+
+Route::post('upload-feed', [
+    'as' => 'feed.store', 'uses' => 'FeedController@store'
+]);
