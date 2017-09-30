@@ -16,7 +16,9 @@ class CreatePackagesTable extends Migration
         Schema::create('packages', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('feed_id')->unsigned()->nullable();
+            $table->string('original_filename');
             $table->json('total');
+            $table->boolean('is_parsed')->default(0);
             $table->timestamp('taken_at');
             $table->timestamps();
 

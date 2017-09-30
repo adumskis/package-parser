@@ -15,7 +15,6 @@ class CreateFeedsTable extends Migration
     {
         Schema::create('feeds', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('filename');
             $table->enum('status', ['in_queue', 'extracting', 'parsing', 'done', 'error']);
             $table->timestamps();
         });

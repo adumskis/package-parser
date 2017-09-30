@@ -15,9 +15,12 @@ class CreateUnitsTable extends Migration
     {
         Schema::create('units', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('unit_id');
             $table->json('data');
             $table->integer('package_id')->unsigned()->nullable();
             $table->timestamps();
+
+            $table->index(['unit_id']);
 
             $table->foreign('package_id')
                 ->references('id')
