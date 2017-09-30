@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Package;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Storage;
+
+class ExtractPackageFile implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $package;
+    protected $packagePath;
+
+    /**
+     * Create a new job instance.
+     * @param Package $package
+     * @return void
+     */
+    public function __construct(Package $package, $packagePath)
+    {
+        $this->package = $package;
+        $this->packagePath = $packagePath;
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        $feed = $this->package->feed;
+        $feed->status = 'extracting';
+        $feed->save();
+        $packageFile = Storage::path($this->packagePath);
+        $destinationPath = storage_path('app/feeds_xmls/' . uniqid() . '.xml');
+        $gz = gzopen($packageFile, 'rb');
+        $destinationFile = fopen($destinationPath, 'wb');
+        while (!gzeof($gz)) {
+            fwrite($destinationFile, gzread($gz, 4096));
+        }
+
+        gzclose($gz);
+        fclose($destinationFile);
+
+        ParsePackageXml::dispatch($this->package, $destinationPath);
+    }
+}

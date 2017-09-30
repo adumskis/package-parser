@@ -6,9 +6,15 @@
             @lang('ui.feed.feeds')
         </div>
         <table class="table">
+            <tr>
+                <th>{{ trans('ui.feed.created_at') }}</th>
+                <th>{{ trans('ui.feed.packages_count') }}</th>
+                <th>{{ trans('ui.feed.status') }}</th>
+            </tr>
             @foreach($feeds as $feed)
                 <tr>
-                    <td>{{ $feed->filename }}</td>
+                    <td>{{ $feed->created_at }}</td>
+                    <td>{{ $feed->packages()->count() }}</td>
                     <td>{{ $feed->status }}</td>
                 </tr>
             @endforeach
@@ -24,7 +30,7 @@
 
             <div class="form-group">
                 {{ Form::label('file', trans('ui.feed.file')) }}
-                {{ Form::file('file') }}
+                {{ Form::file('file[]', ['multiple' => 'multiple']) }}
             </div>
 
             <button type="submit" class="btn btn-primary">
