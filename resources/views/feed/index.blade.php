@@ -13,8 +13,12 @@
             </tr>
             @foreach($feeds as $feed)
                 <tr>
-                    <td>{{ $feed->created_at }}</td>
-                    <td>{{ $feed->packages()->count() }}</td>
+                    <td>
+                        <a href="{{ route('feed.show', $feed->id) }}">
+                            {{ $feed->created_at }}
+                        </a>
+                    </td>
+                    <td>{{ $feed->packages()->count() }} ({{ $feed->packages()->where('is_parsed', 1)->count() }})</td>
                     <td>{{ $feed->status }}</td>
                 </tr>
             @endforeach

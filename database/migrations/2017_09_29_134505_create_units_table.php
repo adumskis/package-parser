@@ -15,17 +15,15 @@ class CreateUnitsTable extends Migration
     {
         Schema::create('units', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('unit_id');
-            $table->json('data');
-            $table->integer('package_id')->unsigned()->nullable();
+            $table->string('uid');
+            $table->integer('feed_id')->unsigned()->nullable();
+            $table->foreign('feed_id')
+                ->references('id')
+                ->on('feeds')
+                ->onDelete('cascade');
             $table->timestamps();
 
-            $table->index(['unit_id']);
-
-            $table->foreign('package_id')
-                ->references('id')
-                ->on('packages')
-                ->onDelete('cascade');
+            $table->index(['uid']);
         });
     }
 

@@ -15,6 +15,14 @@ Route::get('/', [
     'as' => 'feed.index', 'uses' => 'FeedController@index'
 ]);
 
+Route::get('feed/{feed}', [
+    'as' => 'feed.show', 'uses' => 'FeedController@show'
+]);
+
+Route::get('chart-data', [
+    'as' => 'feed.chartData', 'uses' => 'FeedController@chartData'
+]);
+
 Route::post('upload-feed', [
     'as' => 'feed.store', 'uses' => 'FeedController@store'
 ]);

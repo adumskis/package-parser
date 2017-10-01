@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Log;
 use App\Package;
 use App\Unit;
 use Illuminate\Bus\Queueable;
@@ -46,15 +47,18 @@ class ParsePackageXml implements ShouldQueue
             if ($xmlObject->nodeType == \XMLReader::ELEMENT) {
                 switch ($xmlObject->name) {
                     case ('tot'):
-                        $this->package->total = ['Etot_kWh' => $xmlObject->getAttribute('Etot_kWh')];
+                        $this->package->etot_kwh = $xmlObject->getAttribute('Etot_kWh');
                         break;
                     case ('inv'):
-                        Unit::create([
+                        $unit = Unit::firstOrCreate([
+                            'uid' => $xmlObject->getAttribute('InvID'),
+                            'feed_id' => $feed->id
+                        ]);
+
+                        Log::create([
                             'package_id' => $this->package->id,
-                            'unit_id'    => $xmlObject->getAttribute('InvID'),
-                            'data'       => [
-                                'Etot_kWh' => $xmlObject->getAttribute('Etot_kWh'),
-                            ],
+                            'unit_id'    => $unit->id,
+                            'etot_kwh' => (float) $xmlObject->getAttribute('Etot_kWh')
                         ]);
                 }
             }

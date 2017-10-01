@@ -35,20 +35,26 @@ class ExtractPackageFile implements ShouldQueue
      */
     public function handle()
     {
-        $feed = $this->package->feed;
-        $feed->status = 'extracting';
-        $feed->save();
-        $packageFile = Storage::path($this->packagePath);
-        $destinationPath = storage_path('app/feeds_xmls/' . uniqid() . '.xml');
-        $gz = gzopen($packageFile, 'rb');
-        $destinationFile = fopen($destinationPath, 'wb');
-        while (!gzeof($gz)) {
-            fwrite($destinationFile, gzread($gz, 4096));
+        try {
+            $feed = $this->package->feed;
+            $feed->status = 'extracting';
+            $feed->save();
+            $packageFile = Storage::path($this->packagePath);
+            $destinationPath = storage_path('app/feeds_xmls/' . uniqid() . '.xml');
+            $gz = gzopen($packageFile, 'rb');
+            $destinationFile = fopen($destinationPath, 'wb');
+            while (!gzeof($gz)) {
+                fwrite($destinationFile, gzread($gz, 4096));
+            }
+
+            gzclose($gz);
+            fclose($destinationFile);
+
+            ParsePackageXml::dispatch($this->package, $destinationPath);
+        } catch (\Exception $e) {
+            $this->package->feed->update([
+                'status' => 'error'
+            ]);
         }
-
-        gzclose($gz);
-        fclose($destinationFile);
-
-        ParsePackageXml::dispatch($this->package, $destinationPath);
     }
 }
