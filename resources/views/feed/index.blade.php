@@ -25,6 +25,16 @@
         </table>
     </div>
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="panel panel-default">
         <div class="panel-heading">
             @lang('ui.feed.add_feed')

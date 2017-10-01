@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Feed extends Model
 {
-    protected $fillable = ['filename'];
+    protected $fillable = ['filename', 'status'];
 
     public function packages()
     {

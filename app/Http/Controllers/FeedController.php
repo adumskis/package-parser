@@ -27,7 +27,8 @@ class FeedController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file.*' => 'required|file',
+            'file' => 'required',
+            'file.*' => 'required|mimetypes:application/x-gzip',
         ]);
 
         $feed = Feed::create([
@@ -38,7 +39,14 @@ class FeedController extends Controller
             if ($uploadedFile->isValid()) {
                 $path = $uploadedFile->store('packages');
                 $originalName = $uploadedFile->getClientOriginalName();
-                $takenAt = Carbon::createFromTimestamp(substr($originalName, 0, -13));
+                try {
+                    $takenAt = Carbon::createFromTimestamp(substr($originalName, 0, -13));
+                } catch (\Exception $e) {
+                    $feed->delete();
+                    return redirect()->back()->withErrors([
+                        trans('ui.error_while_parsing_filename')
+                    ]);
+                }
 
                 $package = Package::create([
                     'original_filename' => $originalName,

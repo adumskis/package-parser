@@ -11,4 +11,5 @@ return [
         'status' => 'Status',
     ],
     'submit' => 'Submit',
+    'error_while_parsing_filename' => 'Could not parse file name and get timestamp from it'
 ];
