@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Feed;
 use App\Log;
 use App\Package;
 use App\Unit;
@@ -37,12 +38,13 @@ class ParsePackageXml implements ShouldQueue
     public function handle()
     {
         $feed = $this->package->feed;
-        if ($feed->status == 'error') {
+        if ($feed->status === Feed::ERROR) {
             return;
         }
         try {
-            $feed->status = 'parsing';
-            $feed->save();
+            $feed->update([
+                'status' => Feed::PARSING
+            ]);
 
             $xmlObject = new \XMLReader();
             $xmlObject->open($this->xmlPath);
@@ -73,12 +75,12 @@ class ParsePackageXml implements ShouldQueue
             $this->package->save();
         } catch (\Exception $e) {
             $feed->update([
-                'status' => 'error',
+                'status' => Feed::ERROR,
             ]);
         }
 
         if ($feed->packages()->where('is_parsed', 0)->count() == 0) {
-            $feed->status = 'done';
+            $feed->status = Feed::DONE;
             $feed->save();
         }
     }

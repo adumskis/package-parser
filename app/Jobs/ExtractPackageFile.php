@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Feed;
 use App\Package;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -37,7 +38,7 @@ class ExtractPackageFile implements ShouldQueue
     {
         try {
             $feed = $this->package->feed;
-            $feed->status = 'extracting';
+            $feed->status = Feed::EXTRACTING;
             $feed->save();
             $packageFile = Storage::path($this->packagePath);
             $destinationPath = storage_path('app/feeds_xmls/' . uniqid() . '.xml');
@@ -53,7 +54,7 @@ class ExtractPackageFile implements ShouldQueue
             ParsePackageXml::dispatch($this->package, $destinationPath);
         } catch (\Exception $e) {
             $this->package->feed->update([
-                'status' => 'error'
+                'status' => Feed::ERROR
             ]);
         }
     }

@@ -14,7 +14,7 @@ class FeedController extends Controller
 {
     public function index()
     {
-        $feeds = Feed::orderBy('created_at', 'DESC')->get();
+        $feeds = Feed::orderBy('created_at', 'DESC')->paginate();
 
         return view('feed.index', compact('feeds'));
     }
@@ -32,7 +32,7 @@ class FeedController extends Controller
         ]);
 
         $feed = Feed::create([
-            'status' => 'in_queue',
+            'status' => Feed::IN_QUEUE,
         ]);
 
         foreach ($request->file('file', []) as $uploadedFile) {

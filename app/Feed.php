@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Feed extends Model
 {
+    const IN_QUEUE = 'in_queue';
+    const EXTRACTING = 'extracting';
+    const PARSING = 'parsing';
+    const DONE = 'done';
+    const ERROR = 'error';
+
     protected $fillable = ['filename', 'status'];
 
     public function packages()

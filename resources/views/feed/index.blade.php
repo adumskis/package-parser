@@ -8,21 +8,33 @@
         <table class="table">
             <tr>
                 <th>{{ trans('ui.feed.created_at') }}</th>
-                <th>{{ trans('ui.feed.packages_count') }}</th>
+                <th>
+                    {{ trans('ui.feed.packages_count') }}
+                    ({{ trans('ui.feed.parsed') }})
+                </th>
                 <th>{{ trans('ui.feed.status') }}</th>
             </tr>
             @foreach($feeds as $feed)
                 <tr>
                     <td>
-                        <a href="{{ route('feed.show', $feed->id) }}">
+                        @if($feed->status === \App\Feed::DONE)
+                            <a href="{{ route('feed.show', $feed->id) }}">
+                                {{ $feed->created_at }}
+                            </a>
+                        @else
                             {{ $feed->created_at }}
-                        </a>
+                        @endif
                     </td>
                     <td>{{ $feed->packages()->count() }} ({{ $feed->packages()->where('is_parsed', 1)->count() }})</td>
-                    <td>{{ $feed->status }}</td>
+                    <td>
+                        @include('feed._status', ['feed' => $feed])
+                    </td>
                 </tr>
             @endforeach
         </table>
+    </div>
+    <div class="text-center">
+        {{ $feeds->links() }}
     </div>
 
     @if ($errors->any())
