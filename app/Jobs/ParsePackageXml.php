@@ -21,8 +21,6 @@ class ParsePackageXml implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @return void
      */
     public function __construct(Package $package, $xmlPath)
     {
@@ -38,14 +36,19 @@ class ParsePackageXml implements ShouldQueue
     public function handle()
     {
         $feed = $this->package->feed;
+
+        // stop if something wrong with this feed's packages was before
         if ($feed->status === Feed::ERROR) {
             return;
         }
+
+        // try to parse XML file
         try {
             $feed->update([
-                'status' => Feed::PARSING
+                'status' => Feed::PARSING,
             ]);
 
+            // using XMLReader stream
             $xmlObject = new \XMLReader();
             $xmlObject->open($this->xmlPath);
 
@@ -73,12 +76,19 @@ class ParsePackageXml implements ShouldQueue
 
             $this->package->is_parsed = 1;
             $this->package->save();
+
+            // delete file
+            unlink($this->xmlPath);
         } catch (\Exception $e) {
+            // if something wrong happens, set status to false
             $feed->update([
                 'status' => Feed::ERROR,
             ]);
+            return;
         }
 
+
+        // check if all packages were parsed and if yes then update status
         if ($feed->packages()->where('is_parsed', 0)->count() == 0) {
             $feed->status = Feed::DONE;
             $feed->save();

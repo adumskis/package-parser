@@ -21,7 +21,6 @@ class ExtractPackageFile implements ShouldQueue
     /**
      * Create a new job instance.
      * @param Package $package
-     * @return void
      */
     public function __construct(Package $package, $packagePath)
     {
@@ -31,8 +30,6 @@ class ExtractPackageFile implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle()
     {
@@ -51,11 +48,15 @@ class ExtractPackageFile implements ShouldQueue
             gzclose($gz);
             fclose($destinationFile);
 
+            // dispatch job to parse extracted XML file and delete gz file
             ParsePackageXml::dispatch($this->package, $destinationPath);
+            unlink($packageFile);
         } catch (\Exception $e) {
             $this->package->feed->update([
                 'status' => Feed::ERROR
             ]);
+
+            return;
         }
     }
 }

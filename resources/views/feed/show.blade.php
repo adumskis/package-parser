@@ -3,7 +3,7 @@
 @section('content')
     <div class="panel panel-default">
         <div class="panel-heading">
-            @lang('ui.feed.feed')
+            @lang('ui.feed.feed') (Etot_kWh)
         </div>
         <div class="panel-body">
             <canvas id="feedChart" width="100%" height="50px" data-id="{{$feed->id}}"></canvas>
