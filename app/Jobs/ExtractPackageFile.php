@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log as LaravelLog;
 
 class ExtractPackageFile implements ShouldQueue
 {
@@ -55,6 +56,7 @@ class ExtractPackageFile implements ShouldQueue
             $this->package->feed->update([
                 'status' => Feed::ERROR
             ]);
+            LaravelLog::error($e->getMessage());
 
             return;
         }
