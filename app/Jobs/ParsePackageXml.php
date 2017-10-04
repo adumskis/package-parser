@@ -6,6 +6,7 @@ use App\Feed;
 use App\Log;
 use App\Package;
 use App\Unit;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -56,6 +57,16 @@ class ParsePackageXml implements ShouldQueue
             while ($xmlObject->read()) {
                 if ($xmlObject->nodeType == \XMLReader::ELEMENT) {
                     switch ($xmlObject->name) {
+                        case ('ts'):
+                            try {
+                                $this->package->taken_at = Carbon::createFromFormat(
+                                    'y-m-d H:i:s',
+                                    $xmlObject->getAttribute('time')
+                                );
+                            } catch (\Exception $e) {
+                                $this->package->taken_at = null;
+                            }
+                            break;
                         case ('tot'):
                             $this->package->etot_kwh = $xmlObject->getAttribute('Etot_kWh');
                             break;

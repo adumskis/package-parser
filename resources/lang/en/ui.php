@@ -10,6 +10,7 @@ return [
         'packages_count' => 'Packages count',
         'parsed'         => 'Parsed',
         'status'         => 'Status',
+        'total'          => 'Total',
         'statuses'       => [
             'in_queue'   => 'In queue',
             'extracting' => 'Extracting',

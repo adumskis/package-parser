@@ -27,7 +27,7 @@ class FeedController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required',
+            'file'   => 'required',
             'file.*' => 'required|mimetypes:application/x-gzip',
         ]);
 
@@ -39,18 +39,9 @@ class FeedController extends Controller
             if ($uploadedFile->isValid()) {
                 $path = $uploadedFile->store('packages');
                 $originalName = $uploadedFile->getClientOriginalName();
-                try {
-                    $takenAt = Carbon::createFromTimestamp(substr($originalName, 0, -13));
-                } catch (\Exception $e) {
-                    $feed->delete();
-                    return redirect()->back()->withErrors([
-                        trans('ui.error_while_parsing_filename')
-                    ]);
-                }
-
                 $package = Package::create([
                     'original_filename' => $originalName,
-                    'taken_at'          => $takenAt->toDateTimeString(),
+                    'taken_at'          => null,
                     'feed_id'           => $feed->id,
                 ]);
 
@@ -67,18 +58,27 @@ class FeedController extends Controller
 
         $labels = $feed->packages->pluck('formatted_taken_at');
         $datasets = [];
-        foreach ($feed->units as $unit) {
+
+        if ($request->has('total')) {
             $datasets[] = [
-                'label' => $unit->uid,
-                'data'  => $feed->logs()
-                    ->where('unit_id', $unit->id)
-                    ->pluck('logs.etot_kwh'),
+                'label' => 'Total',
+                'data'  => $feed->packages->pluck('etot_kwh'),
             ];
+        } else {
+            foreach ($feed->units as $unit) {
+                $datasets[] = [
+                    'label' => $unit->uid,
+                    'data'  => $feed->logs()
+                        ->where('unit_id', $unit->id)
+                        ->orderBy('taken_at')
+                        ->pluck('logs.etot_kwh'),
+                ];
+            }
         }
 
         return response()->json([
             'datasets' => $datasets,
-            'labels' => $labels
+            'labels'   => $labels,
         ]);
     }
 }
